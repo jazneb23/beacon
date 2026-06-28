@@ -1,3 +1,6 @@
+# Dependencies
+node_modules
+
 # Environment variables
 .env
 .env.local
@@ -5,6 +8,8 @@
 # Build output
 dist
 .next
+.turbo
 
 # OS files
 .DS_Store
+Thumbs.db
