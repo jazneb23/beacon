@@ -6,11 +6,22 @@
 
 @import "./tokens.css";
 
+/*
+ * Theme tokens: light mode is the CSS default on :root; dark mode applies
+ * when `data-theme="dark"` is set on <html> (see tokens.css for values).
+ */
+
 body {
+  margin: 0;
   font-family: var(--font-sans);
   font-size: var(--text-body-size);
   font-weight: var(--text-body-weight);
   line-height: var(--text-body-line-height);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  transition:
+    background-color 150ms,
+    color 150ms;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
