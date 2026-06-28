@@ -1,0 +1,80 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  padding: var(--card-padding);
+  background: var(--color-bg-overlay);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.accountName {
+  margin: 0;
+  font-size: var(--text-account-name-size);
+  font-weight: var(--text-account-name-weight);
+  line-height: var(--text-account-name-line-height);
+  color: var(--color-text-primary);
+}
+
+.planBadge {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-caption-size);
+  font-weight: var(--font-medium);
+  line-height: var(--text-caption-line-height);
+  text-transform: capitalize;
+}
+
+.planFree {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+}
+
+.planPro {
+  background: color-mix(in srgb, var(--color-brand-500) 12%, transparent);
+  color: var(--color-brand-500);
+}
+
+.planEnterprise {
+  background: color-mix(in srgb, var(--color-plan-enterprise) 12%, transparent);
+  color: var(--color-plan-enterprise);
+}
+
+.scoreRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.caption {
+  margin: 0;
+  font-size: var(--text-caption-size);
+  font-weight: var(--text-caption-weight);
+  line-height: var(--text-caption-line-height);
+  color: var(--color-text-muted);
+}
+
+.captionRisk {
+  color: var(--color-health-red);
+}

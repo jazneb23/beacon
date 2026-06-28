@@ -1,0 +1,90 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}
+
+.rowEnter {
+  animation: rowEnter 0.35s ease-out;
+}
+
+@keyframes rowEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.iconWrap {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+.severityAmber {
+  color: var(--color-health-amber);
+  background: var(--color-health-amber-subtle);
+}
+
+.severityRed {
+  color: var(--color-health-red);
+  background: var(--color-health-red-subtle);
+}
+
+.severityMuted {
+  color: var(--color-text-muted);
+  background: var(--color-bg-subtle);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.accountName {
+  flex-shrink: 0;
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+}
+
+.separator {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.description {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.time {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
