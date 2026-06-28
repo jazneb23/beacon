@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import { TopNav } from "../src/components/layout/TopNav";
+import { AppShell } from "../src/components/layout/AppShell";
 import { ThemeProvider } from "../src/components/theme/ThemeProvider";
 import { themeInitScript } from "../src/lib/theme";
 import "./globals.css";
@@ -23,8 +23,7 @@ export default function RootLayout({
           {themeInitScript}
         </Script>
         <ThemeProvider>
-          <TopNav />
-          {children}
+          <AppShell>{children}</AppShell>
         </ThemeProvider>
       </body>
     </html>
