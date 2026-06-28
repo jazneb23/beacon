@@ -1,11 +1,13 @@
 ---
-description: core beacon conventions
+description: Core Beacon conventions
 alwaysApply: true
 ---
 
 # Beacon Conventions
 
-- Use TypeScript everywhere; avoid the `any` type. Prefer explicit types, generics, or `unknown` with narrowing when the type is not known.
-- Every function gets a short comment explaining what it does.
-- When you create a function, also create a matching test.
-- Keep functions small and readable; extract helpers when logic grows beyond a single clear responsibility.
+- Use TypeScript everywhere; never use the `any` type.
+- Every API response is JSON shaped as `{ data: ... }` on success or `{ error: ... }` on failure.
+- Shared types live in `packages/shared` and are imported, never copy-pasted.
+- Every new feature gets a matching test.
+- Keep functions short and add a short comment to each.
+- Always use pnpm in this project, never npm or yarn.
