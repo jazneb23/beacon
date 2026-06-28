@@ -1,0 +1,24 @@
+.figure {
+  margin: 0;
+  padding: var(--space-4);
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 140px;
+}
+
+.gridLine {
+  stroke: var(--color-border);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.area {
+  opacity: 0.14;
+}

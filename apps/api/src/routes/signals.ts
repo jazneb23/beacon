@@ -2,7 +2,11 @@ import { computeScore, type SignalEvent } from "@beacon/shared";
 import { Router } from "express";
 import type { Pool } from "pg";
 import { accountExists } from "../db/accounts.js";
-import { insertSignalEvent, listSignalEventsForAccount } from "../db/signals.js";
+import {
+  insertSignalEvent,
+  listRecentSignalEvents,
+  listSignalEventsForAccount,
+} from "../db/signals.js";
 import { insertHealthScore } from "../db/scores.js";
 import { asyncHandler, sendData, sendError } from "../http.js";
 
@@ -46,9 +50,35 @@ function parseSignalEvent(body: unknown): SignalEvent | null {
   };
 }
 
+const DEFAULT_FEED_LIMIT = 50;
+const MAX_FEED_LIMIT = 100;
+
+/** Parse an optional positive integer limit from a query string. */
+function parseFeedLimit(raw: unknown): number {
+  if (typeof raw !== "string" || raw.length === 0) {
+    return DEFAULT_FEED_LIMIT;
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  if (Number.isNaN(parsed) || parsed < 1) {
+    return DEFAULT_FEED_LIMIT;
+  }
+
+  return Math.min(parsed, MAX_FEED_LIMIT);
+}
+
 /** Ingest signal events and recompute account health scores. */
 export function createSignalsRouter(pool: Pool): Router {
   const router = Router();
+
+  router.get(
+    "/recent",
+    asyncHandler(async (req, res) => {
+      const limit = parseFeedLimit(req.query.limit);
+      const events = await listRecentSignalEvents(pool, limit);
+      sendData(res, events);
+    }),
+  );
 
   router.post(
     "/",
