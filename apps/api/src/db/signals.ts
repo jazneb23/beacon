@@ -1,4 +1,4 @@
-import type { SignalEvent } from "@beacon/shared";
+import type { SignalEvent, SignalFeedItem } from "@beacon/shared";
 import type { Pool } from "pg";
 
 type SignalEventRow = {
@@ -6,6 +6,11 @@ type SignalEventRow = {
   type: SignalEvent["type"];
   value: number;
   at: Date;
+};
+
+type SignalFeedRow = SignalEventRow & {
+  id: number;
+  account_name: string;
 };
 
 /** Map a database row to the shared SignalEvent type. */
@@ -49,4 +54,29 @@ export async function listSignalEventsForAccount(
     [accountId],
   );
   return result.rows.map(toSignalEvent);
+}
+
+/** Map a joined feed row to the shared SignalFeedItem type. */
+function toSignalFeedItem(row: SignalFeedRow): SignalFeedItem {
+  return {
+    id: row.id,
+    accountName: row.account_name,
+    ...toSignalEvent(row),
+  };
+}
+
+/** Load the most recent signal events across all accounts, newest first. */
+export async function listRecentSignalEvents(
+  pool: Pool,
+  limit = 50,
+): Promise<SignalFeedItem[]> {
+  const result = await pool.query<SignalFeedRow>(
+    `SELECT se.id, se.account_id, se.type, se.value, se.at, a.name AS account_name
+     FROM signal_events se
+     JOIN accounts a ON a.id = se.account_id
+     ORDER BY se.at DESC, se.id DESC
+     LIMIT $1`,
+    [limit],
+  );
+  return result.rows.map(toSignalFeedItem);
 }

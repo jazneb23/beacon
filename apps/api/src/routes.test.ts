@@ -12,6 +12,7 @@ vi.mock("./db/accounts.js", () => ({
 
 vi.mock("./db/signals.js", () => ({
   insertSignalEvent: vi.fn(),
+  listRecentSignalEvents: vi.fn(),
   listSignalEventsForAccount: vi.fn(),
 }));
 
@@ -25,7 +26,7 @@ import {
   getAccountWithHistory,
   listAccountsWithLatestScore,
 } from "./db/accounts.js";
-import { insertSignalEvent, listSignalEventsForAccount } from "./db/signals.js";
+import { insertSignalEvent, listRecentSignalEvents, listSignalEventsForAccount } from "./db/signals.js";
 import { insertHealthScore, listLatestHealthScores } from "./db/scores.js";
 
 const pool = {} as Pool;
@@ -100,6 +101,28 @@ describe("routes", () => {
 
       expect(response.status).toBe(404);
       expect(response.body).toEqual({ error: "Account not found" });
+    });
+  });
+
+  describe("GET /signals/recent", () => {
+    it("returns recent signal events with account names", async () => {
+      vi.mocked(listRecentSignalEvents).mockResolvedValue([
+        {
+          id: 42,
+          accountId: "acct-test",
+          accountName: "Test Co",
+          type: "usage",
+          value: 80,
+          at: "2026-06-27T12:00:00Z",
+        },
+      ]);
+
+      const response = await request(app).get("/signals/recent?limit=10");
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].accountName).toBe("Test Co");
+      expect(listRecentSignalEvents).toHaveBeenCalledWith(pool, 10);
     });
   });
 
