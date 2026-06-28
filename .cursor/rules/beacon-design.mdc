@@ -1,0 +1,51 @@
+---
+description: Beacon web app design system — colors, typography, spacing, and components
+globs: apps/web/**
+alwaysApply: false
+---
+
+# Beacon Web Design
+
+## Colors
+
+Never use hard-coded hex values in components. Always reference a CSS custom property from `tokens.css`.
+
+```css
+/* ✅ GOOD */
+color: var(--color-text-primary);
+
+/* ❌ BAD */
+color: #FAFAFA;
+```
+
+## Health Scores
+
+Always use the `HealthScoreBadge` component. Never render a score as a plain number styled inline.
+
+## Icons
+
+Always import from `lucide-react`. Standard sizes are 16px (sm), 20px (md), 24px (lg). No other icon sources.
+
+## Spacing
+
+Use Tailwind utility classes (`p-4`, `gap-6`, etc.) which map to the 4px base scale. Avoid arbitrary values like `p-[18px]`.
+
+## Dark Mode
+
+Never use Tailwind's `dark:` prefix. All theme variation is handled by CSS custom properties in `tokens.css`. Components work in both themes automatically.
+
+## Typography
+
+Use the semantic text tokens for key elements:
+
+- `text-5xl font-bold` — score numbers
+- `text-lg font-semibold` — account names
+- `text-sm` — labels and captions
+
+## Components
+
+Reuse existing components from `src/components/ui/` before creating new ones. Check what exists before building.
+
+## Animation
+
+Keep transitions under 200ms. Use `ease-out`. No bouncy springs on data — only on celebratory/feedback moments.
