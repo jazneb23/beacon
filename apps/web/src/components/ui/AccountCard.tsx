@@ -4,13 +4,17 @@ import type { ReactElement } from "react";
 
 import styles from "./AccountCard.module.css";
 import { getTopNegativeDriver } from "./accountCardUtils";
-import { HealthScoreBadge } from "./HealthScoreBadge";
+import {
+  HealthScoreBadge,
+  type HealthScoreBadgeSize,
+} from "./HealthScoreBadge";
 import { ScoreSparkline } from "./ScoreSparkline";
 
 export type AccountCardProps = {
   account: Account;
   score: HealthScore;
   scoreHistory?: number[];
+  scoreSize?: HealthScoreBadgeSize;
 };
 
 const PLAN_BADGE_CLASS: Record<Account["plan"], string> = {
@@ -24,6 +28,7 @@ export function AccountCard({
   account,
   score,
   scoreHistory,
+  scoreSize = "md",
 }: AccountCardProps): ReactElement {
   const history = scoreHistory ?? Array<number>(6).fill(score.score);
   const topNegativeDriver = getTopNegativeDriver(score.drivers);
@@ -42,7 +47,7 @@ export function AccountCard({
       </div>
 
       <div className={styles.scoreRow}>
-        <HealthScoreBadge score={score.score} trend={score.trend} size="md" />
+        <HealthScoreBadge score={score.score} trend={score.trend} size={scoreSize} />
         <ScoreSparkline scores={history} />
       </div>
 
