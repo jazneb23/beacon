@@ -18,11 +18,22 @@ export type Account = {
   plan: "free" | "pro" | "enterprise";
 };
 
+export type AccountDetail = {
+  account: Account;
+  scoreHistory: HealthScore[];
+  drivers: ScoreDriver[];
+};
+
 export type SignalEvent = {
   accountId: string;
   type: "usage" | "support" | "billing" | "login";
   value: number;
   at: string;
+};
+
+export type SignalFeedItem = SignalEvent & {
+  id: number;
+  accountName: string;
 };
 
 /** Maps each signal type to its scoring driver index. */

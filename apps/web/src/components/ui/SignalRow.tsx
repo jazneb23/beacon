@@ -14,6 +14,7 @@ import { formatRelativeTime, getSignalDescription } from "./signalRowUtils";
 export type SignalRowProps = SignalEvent & {
   accountName: string;
   isNew?: boolean;
+  refreshTick?: number;
 };
 
 const SIGNAL_ICONS: Record<SignalEvent["type"], LucideIcon> = {
@@ -36,10 +37,14 @@ export function SignalRow({
   type,
   at,
   isNew = true,
+  refreshTick,
 }: SignalRowProps): ReactElement {
   const Icon = SIGNAL_ICONS[type];
   const description = getSignalDescription(type);
-  const relativeTime = formatRelativeTime(at);
+  const relativeTime = formatRelativeTime(
+    at,
+    refreshTick !== undefined ? new Date() : undefined,
+  );
   const rowClass = isNew ? `${styles.row} ${styles.rowEnter}` : styles.row;
 
   return (
