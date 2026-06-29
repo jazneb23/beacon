@@ -3,9 +3,11 @@ services:
     name: beacon-api-staging
     runtime: node
     plan: free
-    buildCommand: npm install -g pnpm@latest && pnpm install --frozen-lockfile && pnpm --filter @beacon/api... build
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @beacon/api... build
     startCommand: node apps/api/dist/src/index.js
     envVars:
+      - key: PNPM_VERSION
+        value: "9"
       - key: SKIP_INSTALL_DEPS
         value: "true"
       - key: DATABASE_URL
@@ -15,9 +17,11 @@ services:
     name: beacon-ai-staging
     runtime: node
     plan: free
-    buildCommand: npm install -g pnpm@latest && pnpm install --frozen-lockfile && pnpm --filter @beacon/ai... build
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @beacon/ai... build
     startCommand: node apps/ai/dist/src/index.js
     envVars:
+      - key: PNPM_VERSION
+        value: "9"
       - key: SKIP_INSTALL_DEPS
         value: "true"
       - key: ANTHROPIC_API_KEY
