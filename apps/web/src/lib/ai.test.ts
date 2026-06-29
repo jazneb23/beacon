@@ -56,7 +56,34 @@ describe("fetchAccountSummary", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accountId: "acct-1" }),
+      signal: expect.any(AbortSignal),
     });
+  });
+
+  it("throws when the request times out", async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((_url, options?: RequestInit) => {
+        return new Promise((_resolve, reject) => {
+          if (options?.signal?.aborted) {
+            reject(new DOMException("The operation was aborted.", "AbortError"));
+            return;
+          }
+          options?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("The operation was aborted.", "AbortError"));
+          });
+        });
+      }),
+    );
+
+    const promise = fetchAccountSummary("acct-1");
+    const assertion = expect(promise).rejects.toThrow(
+      "AI request timed out — the AI service may be unavailable",
+    );
+    await vi.advanceTimersByTimeAsync(30_000);
+    await assertion;
+    vi.useRealTimers();
   });
 
   it("throws when the AI service returns an error payload", async () => {
@@ -94,6 +121,7 @@ describe("fetchNextAction", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accountId: "acct-1" }),
+      signal: expect.any(AbortSignal),
     });
   });
 });
