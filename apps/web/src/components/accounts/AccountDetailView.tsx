@@ -9,6 +9,8 @@ import { fetchAccountSummary, fetchNextAction } from "../../lib/ai";
 import { fetchAccountDetail } from "../../lib/api";
 import { chronologicalScores } from "../../lib/scoreHistory";
 import { AIInsightCard } from "../ui/AIInsightCard";
+import { fetchAccountDetail } from "../../lib/api";
+import { chronologicalScores } from "../../lib/scoreHistory";
 import { DriverBar } from "../ui/DriverBar";
 import { HealthScoreBadge } from "../ui/HealthScoreBadge";
 import { ScoreHistoryChart } from "../ui/ScoreHistoryChart";

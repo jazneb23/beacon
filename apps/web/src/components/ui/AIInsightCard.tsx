@@ -6,11 +6,13 @@ import { useCallback, useState, type ReactElement } from "react";
 import styles from "./AIInsightCard.module.css";
 
 export type InsightAction = "summarize" | "draft-next-action";
+export type InsightAction = "summarize" | "draft-outreach";
 
 export type AIInsightCardProps = {
   accountId: string;
   onSummarize: (accountId: string) => Promise<string>;
   onDraftNextAction: (accountId: string) => Promise<string>;
+  onDraftOutreach: (accountId: string) => Promise<string>;
   className?: string;
 };
 
@@ -19,6 +21,7 @@ export function AIInsightCard({
   accountId,
   onSummarize,
   onDraftNextAction,
+  onDraftOutreach,
   className,
 }: AIInsightCardProps): ReactElement {
   const [loadingAction, setLoadingAction] = useState<InsightAction | null>(null);
@@ -36,6 +39,7 @@ export function AIInsightCard({
           action === "summarize"
             ? await onSummarize(accountId)
             : await onDraftNextAction(accountId);
+            : await onDraftOutreach(accountId);
         setContent(text);
       } catch {
         setError("Something went wrong. Try again in a moment.");
@@ -44,6 +48,7 @@ export function AIInsightCard({
       }
     },
     [accountId, onDraftNextAction, onSummarize],
+    [accountId, onDraftOutreach, onSummarize],
   );
 
   return (
@@ -54,6 +59,11 @@ export function AIInsightCard({
       <header className={styles.header}>
         <Sparkles aria-hidden className={styles.icon} />
         <h2 className={styles.title}>AI Insight</h2>
+      aria-label="Account insights"
+    >
+      <header className={styles.header}>
+        <Sparkles aria-hidden className={styles.icon} />
+        <h2 className={styles.title}>Insights</h2>
       </header>
 
       <div className={styles.actions}>
@@ -68,6 +78,10 @@ export function AIInsightCard({
           loading={loadingAction === "draft-next-action"}
           disabled={loadingAction !== null}
           onClick={() => void runAction("draft-next-action")}
+          label="Draft outreach"
+          loading={loadingAction === "draft-outreach"}
+          disabled={loadingAction !== null}
+          onClick={() => void runAction("draft-outreach")}
         />
       </div>
 

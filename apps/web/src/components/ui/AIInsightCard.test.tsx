@@ -9,6 +9,7 @@ afterEach(() => {
 
 describe("AIInsightCard", () => {
   it("renders AI insight actions", () => {
+  it("renders insight actions without an obvious intelligence label", () => {
     render(
       <AIInsightCard
         accountId="acct-northwind"
@@ -20,6 +21,14 @@ describe("AIInsightCard", () => {
     expect(screen.getByRole("heading", { name: "AI Insight" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Summarize" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Draft next action" })).toBeInTheDocument();
+        onDraftOutreach={vi.fn().mockResolvedValue("Outreach draft")}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Insights" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Summarize" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Draft outreach" })).toBeInTheDocument();
+    expect(screen.queryByText(/ai/i)).not.toBeInTheDocument();
   });
 
   it("shows a spinner while summarizing and renders the returned text", async () => {
@@ -36,6 +45,7 @@ describe("AIInsightCard", () => {
         accountId="acct-northwind"
         onSummarize={onSummarize}
         onDraftNextAction={vi.fn()}
+        onDraftOutreach={vi.fn()}
       />,
     );
 
@@ -47,6 +57,7 @@ describe("AIInsightCard", () => {
       "true",
     );
     expect(screen.getByRole("button", { name: "Draft next action" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Draft outreach" })).toBeDisabled();
 
     resolveSummary("Usage is steady; billing risk is the main concern.");
 
@@ -58,6 +69,7 @@ describe("AIInsightCard", () => {
   });
 
   it("drafts the next action and replaces the highlight content", async () => {
+  it("drafts outreach and replaces the highlight content", async () => {
     render(
       <AIInsightCard
         accountId="acct-northwind"
@@ -67,6 +79,9 @@ describe("AIInsightCard", () => {
           .mockResolvedValue(
             "Schedule a check-in.\n\nHi team — wanted to check in on your recent billing questions.",
           )}
+        onDraftOutreach={vi
+          .fn()
+          .mockResolvedValue("Hi team — wanted to check in on your recent billing questions.")}
       />,
     );
 
@@ -77,6 +92,13 @@ describe("AIInsightCard", () => {
 
     expect(await screen.findByText(/Schedule a check-in/)).toBeInTheDocument();
     expect(screen.getByText(/billing questions/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Draft outreach" }));
+
+    expect(
+      await screen.findByText(
+        "Hi team — wanted to check in on your recent billing questions.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Existing summary")).not.toBeInTheDocument();
   });
 
@@ -86,6 +108,7 @@ describe("AIInsightCard", () => {
         accountId="acct-northwind"
         onSummarize={vi.fn().mockRejectedValue(new Error("network"))}
         onDraftNextAction={vi.fn()}
+        onDraftOutreach={vi.fn()}
       />,
     );
 
