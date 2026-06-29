@@ -156,7 +156,7 @@ export function AccountDetailView({ accountId }: AccountDetailViewProps): ReactE
   return (
     <section className={styles.page}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <Link href="/" className={styles.breadcrumbLink}>
+        <Link href="/" className={styles.breadcrumbLink} data-testid="back-to-board">
           Health Board
         </Link>
         <ChevronRight size={14} aria-hidden className={styles.breadcrumbSep} />

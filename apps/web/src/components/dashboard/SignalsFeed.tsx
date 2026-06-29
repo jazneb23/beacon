@@ -100,7 +100,11 @@ export function SignalsFeed({ variant = "panel", limit = 50 }: SignalsFeedProps)
     variant === "page" ? `${styles.panel} ${styles.panelPage}` : styles.panel;
 
   return (
-    <aside className={panelClass} aria-labelledby="signals-feed-title">
+    <aside
+      className={panelClass}
+      aria-labelledby="signals-feed-title"
+      data-testid="signals-feed"
+    >
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <Radio size={16} aria-hidden className={styles.headerIcon} />

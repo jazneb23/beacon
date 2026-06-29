@@ -40,12 +40,14 @@ export function AIInsightCard({
       <div className={styles.actions}>
         <InsightButton
           label="Summarize"
+          testId="btn-summarize"
           loading={loadingAction === "summarize"}
           disabled={busy}
           onClick={onSummarize}
         />
         <InsightButton
           label="Draft outreach"
+          testId="btn-draft-outreach"
           loading={loadingAction === "draft-outreach"}
           disabled={busy}
           onClick={onDraftOutreach}
@@ -75,6 +77,7 @@ export function AIInsightCard({
 
 type InsightButtonProps = {
   label: string;
+  testId: string;
   loading: boolean;
   disabled: boolean;
   onClick: () => void;
@@ -83,6 +86,7 @@ type InsightButtonProps = {
 /** Secondary action button that swaps to a spinner while loading. */
 function InsightButton({
   label,
+  testId,
   loading,
   disabled,
   onClick,
@@ -94,6 +98,7 @@ function InsightButton({
       onClick={onClick}
       disabled={disabled}
       aria-busy={loading}
+      data-testid={testId}
     >
       {loading ? (
         <>

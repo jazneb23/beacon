@@ -131,7 +131,9 @@ export function HealthScoreBadge({
       }}
       aria-label={`Health score ${displayScore}, ${TREND_LABELS[trend]}`}
     >
-      <span style={scoreStyle}>{animatedScore}</span>
+      <span style={scoreStyle} data-testid="health-score">
+        {animatedScore}
+      </span>
       {renderTrendIcon(trend, iconSize, strokeWidth)}
     </span>
   );
