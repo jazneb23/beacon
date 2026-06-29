@@ -36,6 +36,15 @@ export type SignalFeedItem = SignalEvent & {
   accountName: string;
 };
 
+export type AccountSummary = {
+  summary: string;
+};
+
+export type NextAction = {
+  action: string;
+  message: string;
+};
+
 /** Maps each signal type to its scoring driver index. */
 const SIGNAL_TYPE_INDEX: Record<SignalEvent["type"], number> = {
   usage: 0,

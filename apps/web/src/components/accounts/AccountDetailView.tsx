@@ -9,8 +9,6 @@ import { fetchAccountSummary, fetchNextAction } from "../../lib/ai";
 import { fetchAccountDetail } from "../../lib/api";
 import { chronologicalScores } from "../../lib/scoreHistory";
 import { AIInsightCard } from "../ui/AIInsightCard";
-import { fetchAccountDetail } from "../../lib/api";
-import { chronologicalScores } from "../../lib/scoreHistory";
 import { DriverBar } from "../ui/DriverBar";
 import { HealthScoreBadge } from "../ui/HealthScoreBadge";
 import { ScoreHistoryChart } from "../ui/ScoreHistoryChart";
@@ -104,43 +102,48 @@ export function AccountDetailView({ accountId }: AccountDetailViewProps): ReactE
             )}
           </header>
 
-          <section className={styles.section} aria-labelledby="score-history-heading">
-            <h2 id="score-history-heading" className={styles.sectionTitle}>
-              Score history
-            </h2>
-            {state.scoreHistory.length > 0 ? (
-              <ScoreHistoryChart scores={state.scoreHistory} />
-            ) : (
-              <p className={styles.emptyState}>No score history available.</p>
-            )}
-          </section>
+          <div className={styles.layout}>
+            <div className={styles.main}>
+              <section className={styles.section} aria-labelledby="score-history-heading">
+                <h2 id="score-history-heading" className={styles.sectionTitle}>
+                  Score history
+                </h2>
+                {state.scoreHistory.length > 0 ? (
+                  <ScoreHistoryChart scores={state.scoreHistory} />
+                ) : (
+                  <p className={styles.emptyState}>No score history available.</p>
+                )}
+              </section>
 
-          <section className={styles.section} aria-labelledby="score-drivers-heading">
-            <h2 id="score-drivers-heading" className={styles.sectionTitle}>
-              Score drivers
-            </h2>
-            {state.drivers.length > 0 ? (
-              <div className={styles.driverList}>
-                {state.drivers.map((driver) => (
-                  <DriverBar
-                    key={driver.label}
-                    label={driver.label}
-                    weight={driver.weight}
-                    direction={driver.direction}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className={styles.emptyState}>No driver data available.</p>
-            )}
-          </section>
+              <section className={styles.section} aria-labelledby="score-drivers-heading">
+                <h2 id="score-drivers-heading" className={styles.sectionTitle}>
+                  Score drivers
+                </h2>
+                {state.drivers.length > 0 ? (
+                  <div className={styles.driverList}>
+                    {state.drivers.map((driver) => (
+                      <DriverBar
+                        key={driver.label}
+                        label={driver.label}
+                        weight={driver.weight}
+                        direction={driver.direction}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className={styles.emptyState}>No driver data available.</p>
+                )}
+              </section>
+            </div>
 
-          <AIInsightCard
-            accountId={state.account.id}
-            onSummarize={fetchAccountSummary}
-            onDraftNextAction={fetchNextAction}
-            className={styles.section}
-          />
+            <aside className={styles.aside}>
+              <AIInsightCard
+                accountId={state.account.id}
+                onSummarize={fetchAccountSummary}
+                onDraftNextAction={fetchNextAction}
+              />
+            </aside>
+          </div>
         </>
       )}
     </section>

@@ -11,9 +11,6 @@ const nextConfig: NextConfig = {
     root: monorepoRoot,
   },
   outputFileTracingRoot: monorepoRoot,
-
-const nextConfig: NextConfig = {
-  /* config options here */
 };
 
 export default nextConfig;

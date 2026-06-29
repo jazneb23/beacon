@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   fetchAccountSummary,
   fetchNextAction,
-  formatNextActionText,
+  formatNextAction,
   getAiUrl,
 } from "./ai";
 
@@ -30,33 +30,60 @@ describe("getAiUrl", () => {
   });
 });
 
-describe("formatNextActionText", () => {
+describe("formatNextAction", () => {
   it("joins action and message with a blank line", () => {
     expect(
-      formatNextActionText({
-        action: "Offer a product walkthrough.",
-        message: "Hi there — noticed strong usage lately.",
+      formatNextAction({
+        action: "Schedule a check-in call",
+        message: "Hi team — wanted to follow up on billing.",
       }),
-    ).toBe("Offer a product walkthrough.\n\nHi there — noticed strong usage lately.");
+    ).toBe("Schedule a check-in call\n\nHi team — wanted to follow up on billing.");
   });
 });
 
 describe("fetchAccountSummary", () => {
-  it("returns summary text from the AI service", async () => {
+  it("posts accountId and returns the summary text", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ data: { summary: "Account health is stable." } }),
+        json: async () => ({ data: { summary: "Usage is steady." } }),
       }),
     );
 
-    await expect(fetchAccountSummary("acct-1")).resolves.toBe("Account health is stable.");
+    await expect(fetchAccountSummary("acct-1")).resolves.toBe("Usage is steady.");
     expect(fetch).toHaveBeenCalledWith("http://localhost:3002/summary", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accountId: "acct-1" }),
+      signal: expect.any(AbortSignal),
     });
+  });
+
+  it("throws when the request times out", async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((_url, options?: RequestInit) => {
+        return new Promise((_resolve, reject) => {
+          if (options?.signal?.aborted) {
+            reject(new DOMException("The operation was aborted.", "AbortError"));
+            return;
+          }
+          options?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("The operation was aborted.", "AbortError"));
+          });
+        });
+      }),
+    );
+
+    const promise = fetchAccountSummary("acct-1");
+    const assertion = expect(promise).rejects.toThrow(
+      "AI request timed out — the AI service may be unavailable",
+    );
+    await vi.advanceTimersByTimeAsync(30_000);
+    await assertion;
+    vi.useRealTimers();
   });
 
   it("throws when the AI service returns an error payload", async () => {
@@ -73,27 +100,28 @@ describe("fetchAccountSummary", () => {
 });
 
 describe("fetchNextAction", () => {
-  it("returns formatted action text from the AI service", async () => {
+  it("returns formatted action and message text", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
         ok: true,
         json: async () => ({
           data: {
-            action: "Schedule a check-in.",
-            message: "Hi — wanted to follow up on your recent usage.",
+            action: "Send a usage recap",
+            message: "Hi — here is a quick snapshot of your recent activity.",
           },
         }),
       }),
     );
 
     await expect(fetchNextAction("acct-1")).resolves.toBe(
-      "Schedule a check-in.\n\nHi — wanted to follow up on your recent usage.",
+      "Send a usage recap\n\nHi — here is a quick snapshot of your recent activity.",
     );
     expect(fetch).toHaveBeenCalledWith("http://localhost:3002/next-action", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accountId: "acct-1" }),
+      signal: expect.any(AbortSignal),
     });
   });
 });

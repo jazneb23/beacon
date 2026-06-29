@@ -1,57 +1,65 @@
+import type { AccountSummary, NextAction } from "@beacon/shared";
+
 const DEFAULT_AI_URL = "http://localhost:3002";
 
-type AiDataResponse<T> = { data: T };
-type AiErrorResponse = { error: string };
-
-type SummaryResult = {
-  summary: string;
-};
-
-type NextActionResult = {
-  action: string;
-  message: string;
-};
+type ApiDataResponse<T> = { data: T };
+type ApiErrorResponse = { error: string };
 
 /** Resolve the public AI service base URL from env with a local dev default. */
 export function getAiUrl(): string {
   return process.env.NEXT_PUBLIC_AI_URL ?? DEFAULT_AI_URL;
 }
 
+const AI_REQUEST_TIMEOUT_MS = 30_000;
+
 /** POST JSON to the AI service and unwrap the `{ data }` envelope. */
 async function postAiData<T>(path: string, body: Record<string, string>): Promise<T> {
-  const response = await fetch(`${getAiUrl()}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const payload = (await response.json()) as AiDataResponse<T> | AiErrorResponse;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT_MS);
 
-  if (!response.ok) {
-    const message =
-      "error" in payload ? payload.error : `Request failed (${response.status})`;
-    throw new Error(message);
+  try {
+    const response = await fetch(`${getAiUrl()}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    const payload = (await response.json()) as ApiDataResponse<T> | ApiErrorResponse;
+
+    if (!response.ok) {
+      const message =
+        "error" in payload ? payload.error : `Request failed (${response.status})`;
+      throw new Error(message);
+    }
+
+    if (!("data" in payload)) {
+      throw new Error("Invalid AI response");
+    }
+
+    return payload.data;
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error("AI request timed out — the AI service may be unavailable");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  if (!("data" in payload)) {
-    throw new Error("Invalid AI response");
-  }
-
-  return payload.data;
 }
 
-/** Request a plain-English health summary for an account. */
+/** Generate a plain-English account health summary. */
 export async function fetchAccountSummary(accountId: string): Promise<string> {
-  const result = await postAiData<SummaryResult>("/summary", { accountId });
-  return result.summary;
+  const { summary } = await postAiData<AccountSummary>("/summary", { accountId });
+  return summary;
 }
 
-/** Format the next-action payload as readable text for the insight card. */
-export function formatNextActionText(result: NextActionResult): string {
-  return `${result.action}\n\n${result.message}`;
+/** Format next-action fields into readable display text. */
+export function formatNextAction({ action, message }: NextAction): string {
+  return `${action}\n\n${message}`;
 }
 
-/** Request a recommended next step and draft outreach for an account. */
+/** Propose the best next step and draft outreach for an account. */
 export async function fetchNextAction(accountId: string): Promise<string> {
-  const result = await postAiData<NextActionResult>("/next-action", { accountId });
-  return formatNextActionText(result);
+  const result = await postAiData<NextAction>("/next-action", { accountId });
+  return formatNextAction(result);
 }
