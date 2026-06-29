@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AIInsightCard } from "./AIInsightCard";
@@ -11,85 +11,86 @@ describe("AIInsightCard", () => {
   it("renders the AI insight card with both actions", () => {
     render(
       <AIInsightCard
-        accountId="acct-northwind"
-        onSummarize={vi.fn().mockResolvedValue("Summary text")}
-        onDraftNextAction={vi.fn().mockResolvedValue("Next action draft")}
+        content={null}
+        loadingAction={null}
+        error={null}
+        onSummarize={vi.fn()}
+        onDraftOutreach={vi.fn()}
       />,
     );
 
     expect(screen.getByRole("heading", { name: "AI Insight" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Summarize" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Draft next action" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Draft outreach" })).toBeInTheDocument();
   });
 
-  it("shows a spinner while summarizing and renders the returned text", async () => {
-    let resolveSummary: (value: string) => void = () => undefined;
-    const onSummarize = vi.fn(
-      () =>
-        new Promise<string>((resolve) => {
-          resolveSummary = resolve;
-        }),
-    );
-
+  it("invokes the action handlers on click", () => {
+    const onSummarize = vi.fn();
+    const onDraftOutreach = vi.fn();
     render(
       <AIInsightCard
-        accountId="acct-northwind"
+        content={null}
+        loadingAction={null}
+        error={null}
         onSummarize={onSummarize}
-        onDraftNextAction={vi.fn()}
+        onDraftOutreach={onDraftOutreach}
       />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Summarize" }));
+    fireEvent.click(screen.getByRole("button", { name: "Draft outreach" }));
 
-    expect(onSummarize).toHaveBeenCalledWith("acct-northwind");
+    expect(onSummarize).toHaveBeenCalledTimes(1);
+    expect(onDraftOutreach).toHaveBeenCalledTimes(1);
+  });
+
+  it("marks the active button busy and disables the other while loading", () => {
+    render(
+      <AIInsightCard
+        content={null}
+        loadingAction="summarize"
+        error={null}
+        onSummarize={vi.fn()}
+        onDraftOutreach={vi.fn()}
+      />,
+    );
+
     expect(screen.getByRole("button", { name: "Summarize" })).toHaveAttribute(
       "aria-busy",
       "true",
     );
-    expect(screen.getByRole("button", { name: "Draft next action" })).toBeDisabled();
-
-    resolveSummary("Usage is steady; billing risk is the main concern.");
-
-    await waitFor(() => {
-      expect(
-        screen.getByText("Usage is steady; billing risk is the main concern."),
-      ).toBeInTheDocument();
-    });
+    expect(screen.getByRole("button", { name: "Draft outreach" })).toBeDisabled();
   });
 
-  it("drafts a next action and replaces the highlight content", async () => {
+  it("renders returned content in the highlight box", () => {
     render(
       <AIInsightCard
-        accountId="acct-northwind"
-        onSummarize={vi.fn().mockResolvedValue("Existing summary")}
-        onDraftNextAction={vi
-          .fn()
-          .mockResolvedValue("Schedule a check-in\n\nHi team — wanted to check in.")}
+        content="Usage is steady; billing risk is the main concern."
+        loadingAction={null}
+        error={null}
+        onSummarize={vi.fn()}
+        onDraftOutreach={vi.fn()}
       />,
     );
-
-    fireEvent.click(screen.getByRole("button", { name: "Summarize" }));
-    await screen.findByText("Existing summary");
-
-    fireEvent.click(screen.getByRole("button", { name: "Draft next action" }));
-
-    expect(await screen.findByText(/Hi team — wanted to check in\./)).toBeInTheDocument();
-    expect(screen.queryByText("Existing summary")).not.toBeInTheDocument();
-  });
-
-  it("shows an error message when an action fails", async () => {
-    render(
-      <AIInsightCard
-        accountId="acct-northwind"
-        onSummarize={vi.fn().mockRejectedValue(new Error("network"))}
-        onDraftNextAction={vi.fn()}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Summarize" }));
 
     expect(
-      await screen.findByText("Something went wrong. Try again in a moment."),
+      screen.getByText("Usage is steady; billing risk is the main concern."),
+    ).toBeInTheDocument();
+  });
+
+  it("shows an error message when provided", () => {
+    render(
+      <AIInsightCard
+        content={null}
+        loadingAction={null}
+        error="Something went wrong. Try again in a moment."
+        onSummarize={vi.fn()}
+        onDraftOutreach={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText("Something went wrong. Try again in a moment."),
     ).toBeInTheDocument();
   });
 });

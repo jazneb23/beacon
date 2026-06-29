@@ -19,6 +19,16 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+.headerLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.headerIcon {
+  color: var(--color-text-secondary);
+}
+
 .title {
   margin: 0;
   font-size: var(--text-base);
@@ -27,24 +37,34 @@
   color: var(--color-text-primary);
 }
 
+.liveLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  letter-spacing: 0.1em;
+  color: var(--color-health-green);
+}
+
 .liveDot {
   width: 8px;
   height: 8px;
   border-radius: var(--radius-full);
-  background: var(--color-brand-500);
-  animation: pulse 2s ease-out infinite;
+  background: var(--color-health-green);
+  animation: livePulse 1.6s ease-out infinite;
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
+/* Local keyframes: CSS Modules scope animation names under Turbopack. */
+@keyframes livePulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-health-green) 60%, transparent);
   }
-
-  50% {
-    opacity: 0.55;
-    transform: scale(0.92);
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 
@@ -55,17 +75,26 @@
   padding: var(--space-2) 0;
 }
 
-.message,
+.group {
+  padding-bottom: var(--space-2);
+}
+
+.groupLabel {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
 .messageError {
   margin: 0;
   padding: var(--space-6) var(--space-4);
   text-align: center;
   font-size: var(--text-sm);
   line-height: var(--leading-sm);
-  color: var(--color-text-secondary);
-}
-
-.messageError {
   color: var(--color-health-red);
 }
 
@@ -74,7 +103,6 @@
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  line-height: var(--leading-sm);
   color: var(--color-brand-500);
   background: color-mix(in srgb, var(--color-brand-500) 10%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-brand-500) 24%, transparent);
@@ -87,8 +115,30 @@
   background: color-mix(in srgb, var(--color-brand-500) 16%, transparent);
 }
 
+.footer {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.viewAll {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-brand-500);
+  text-decoration: none;
+}
+
+.viewAll:hover {
+  text-decoration: underline;
+}
+
+.panelPage {
+  height: auto;
+}
+
 @media (min-width: 1024px) {
-  .panel {
+  .panel:not(.panelPage) {
     position: sticky;
     top: var(--space-6);
     max-height: calc(100dvh - var(--header-height) - var(--space-12));

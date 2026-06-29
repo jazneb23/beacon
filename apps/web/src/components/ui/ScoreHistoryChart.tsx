@@ -1,61 +1,88 @@
-import type { ReactElement } from "react";
+"use client";
 
-import { buildSparklinePath } from "./accountCardUtils";
+import type { ReactElement } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
 import { getHealthScoreBand, getHealthScoreColor } from "./healthScoreBand";
 import styles from "./ScoreHistoryChart.module.css";
 
 type ScoreHistoryChartProps = {
   scores: number[];
-  width?: number;
   height?: number;
 };
 
-const GRID_LINES = [0, 50, 100];
+const AT_RISK_THRESHOLD = 40;
 
-/** Render a larger score trend chart for the account detail page. */
+/** Interactive score history line chart with axes, tooltip, and risk line. */
 export function ScoreHistoryChart({
   scores,
-  width = 640,
-  height = 180,
+  height = 240,
 }: ScoreHistoryChartProps): ReactElement {
   const latestScore = scores[scores.length - 1] ?? 0;
   const stroke = getHealthScoreColor(getHealthScoreBand(latestScore));
-  const path = buildSparklinePath(scores, width, height, 8);
-  const areaPath = `${path} L ${width - 8} ${height - 8} L 8 ${height - 8} Z`;
+  const data = scores.map((score, index) => ({ point: index + 1, score }));
 
   return (
-    <figure className={styles.figure}>
-      <svg
-        aria-labelledby="score-history-title"
-        data-testid="score-history-chart"
-        className={styles.chart}
-        viewBox={`0 0 ${width} ${height}`}
-        preserveAspectRatio="none"
-      >
-        <title id="score-history-title">Health score history</title>
-        {GRID_LINES.map((line) => {
-          const y = 8 + (height - 16) - (line / 100) * (height - 16);
-          return (
-            <line
-              key={line}
-              x1={8}
-              x2={width - 8}
-              y1={y}
-              y2={y}
-              className={styles.gridLine}
-            />
-          );
-        })}
-        <path d={areaPath} className={styles.area} style={{ fill: stroke }} />
-        <path
-          d={path}
-          fill="none"
-          stroke={stroke}
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+    <figure className={styles.figure} data-testid="score-history-chart">
+      <ResponsiveContainer width="100%" height={height}>
+        <LineChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: -16 }}>
+          <CartesianGrid strokeDasharray="4 4" stroke="var(--color-border)" vertical={false} />
+          <XAxis
+            dataKey="point"
+            tick={{ fill: "var(--color-text-muted)", fontSize: 12 }}
+            stroke="var(--color-border)"
+            tickLine={false}
+          />
+          <YAxis
+            domain={[0, 100]}
+            tick={{ fill: "var(--color-text-muted)", fontSize: 12 }}
+            stroke="var(--color-border)"
+            tickLine={false}
+            width={48}
+          />
+          <Tooltip
+            contentStyle={{
+              background: "var(--color-bg-overlay)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "8px",
+              color: "var(--color-text-primary)",
+              fontSize: "12px",
+            }}
+            labelStyle={{ color: "var(--color-text-muted)" }}
+            labelFormatter={(label) => `Reading ${label}`}
+            formatter={(value) => [value as number, "Score"]}
+          />
+          <ReferenceLine
+            y={AT_RISK_THRESHOLD}
+            stroke="var(--color-health-red)"
+            strokeDasharray="4 4"
+            label={{
+              value: "At risk",
+              position: "insideBottomRight",
+              fill: "var(--color-health-red)",
+              fontSize: 11,
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="score"
+            stroke={stroke}
+            strokeWidth={2.5}
+            dot={false}
+            activeDot={{ r: 4 }}
+            isAnimationActive={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </figure>
   );
 }

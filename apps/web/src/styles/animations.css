@@ -1,0 +1,62 @@
+/**
+ * Beacon shared animations — keyframes used across loading, entrance,
+ * and feedback micro-interactions. Import once at the app root.
+ */
+
+/* Skeleton loaders pulse between subtle and base surface tones. */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Staggered card entrance: rise and fade in. */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Brief highlight flash when a live score changes. */
+@keyframes scoreHighlight {
+  0% {
+    background: transparent;
+  }
+  30% {
+    background: color-mix(in srgb, currentColor 18%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* Live indicator dot pulse. */
+@keyframes livePulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-health-green) 60%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

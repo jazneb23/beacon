@@ -88,6 +88,9 @@
 }
 
 .highlight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   padding: var(--space-4);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-brand-500) 8%, var(--color-bg-subtle));

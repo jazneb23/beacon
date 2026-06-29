@@ -36,7 +36,10 @@ export function ThemeProvider({ children }: ThemeProviderProps): ReactElement {
   const [theme, setThemeState] = useState<Theme>(DEFAULT_THEME);
 
   useEffect(() => {
+    // Intentional: read the persisted theme only after hydration so the
+    // server-rendered markup (default theme) matches the first client render.
     const storedTheme = getStoredTheme();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(storedTheme);
     applyTheme(storedTheme);
   }, []);

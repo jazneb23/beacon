@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Toaster } from "react-hot-toast";
 
+import { PageTitleProvider } from "../src/contexts/PageTitleContext";
+import { UserProvider } from "../src/contexts/UserContext";
 import { AppShell } from "../src/components/layout/AppShell";
 import { ThemeProvider } from "../src/components/theme/ThemeProvider";
 import { themeInitScript } from "../src/lib/theme";
@@ -23,7 +26,12 @@ export default function RootLayout({
           {themeInitScript}
         </Script>
         <ThemeProvider>
-          <AppShell>{children}</AppShell>
+          <UserProvider>
+            <PageTitleProvider>
+              <AppShell>{children}</AppShell>
+              <Toaster position="bottom-right" gutter={8} />
+            </PageTitleProvider>
+          </UserProvider>
         </ThemeProvider>
       </body>
     </html>

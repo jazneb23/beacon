@@ -29,7 +29,10 @@ export function DriverBar({
 
   return (
     <div className={className ? `${styles.root} ${className}` : styles.root}>
-      <span className={styles.label}>{label}</span>
+      <div className={styles.labelRow}>
+        <span className={styles.label}>{label}</span>
+        <span className={styles.percent}>{percent}%</span>
+      </div>
       <div
         className={styles.track}
         role="meter"

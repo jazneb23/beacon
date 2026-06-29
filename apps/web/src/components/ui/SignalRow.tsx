@@ -6,8 +6,10 @@ import {
   MessageSquare,
   type LucideIcon,
 } from "lucide-react";
+import Link from "next/link";
 import type { ReactElement } from "react";
 
+import { formatScoreDelta, getSignalScoreDelta } from "../../lib/signalScoreDelta";
 import styles from "./SignalRow.module.css";
 import { formatRelativeTime, getSignalDescription } from "./signalRowUtils";
 
@@ -33,8 +35,10 @@ const SEVERITY_CLASS: Record<SignalEvent["type"], string> = {
 
 /** Compact row for a single signal in the live feed. */
 export function SignalRow({
+  accountId,
   accountName,
   type,
+  value,
   at,
   isNew = true,
   refreshTick,
@@ -45,24 +49,35 @@ export function SignalRow({
     at,
     refreshTick !== undefined ? new Date() : undefined,
   );
+  const delta = getSignalScoreDelta(type, value);
   const rowClass = isNew ? `${styles.row} ${styles.rowEnter}` : styles.row;
 
   return (
     <article className={rowClass} aria-label={`${accountName}: ${description}`}>
-      <span
-        className={`${styles.iconWrap} ${SEVERITY_CLASS[type]}`}
-        aria-hidden
-      >
+      <span className={`${styles.iconWrap} ${SEVERITY_CLASS[type]}`} aria-hidden>
         <Icon className={styles.icon} />
       </span>
 
       <div className={styles.body}>
-        <span className={styles.accountName}>{accountName}</span>
+        <Link href={`/accounts/${accountId}`} className={styles.accountName}>
+          {accountName}
+        </Link>
         <span className={styles.separator} aria-hidden>
           ·
         </span>
         <span className={styles.description}>{description}</span>
       </div>
+
+      {delta !== 0 ? (
+        <span
+          className={styles.delta}
+          style={{
+            color: delta > 0 ? "var(--color-health-green)" : "var(--color-health-red)",
+          }}
+        >
+          {formatScoreDelta(delta)}
+        </span>
+      ) : null}
 
       <time className={styles.time} dateTime={at}>
         {relativeTime}

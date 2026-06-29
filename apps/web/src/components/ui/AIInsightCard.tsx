@@ -1,50 +1,31 @@
 "use client";
 
 import { Loader2, Sparkles } from "lucide-react";
-import { useCallback, useState, type ReactElement } from "react";
+import type { ReactElement } from "react";
 
+import type { InsightAction } from "../../hooks/useAccountInsight";
+import { Skeleton } from "./Skeleton";
 import styles from "./AIInsightCard.module.css";
 
-export type InsightAction = "summarize" | "draft-next-action";
-
 export type AIInsightCardProps = {
-  accountId: string;
-  onSummarize: (accountId: string) => Promise<string>;
-  onDraftNextAction: (accountId: string) => Promise<string>;
+  content: string | null;
+  loadingAction: InsightAction | null;
+  error: string | null;
+  onSummarize: () => void;
+  onDraftOutreach: () => void;
   className?: string;
 };
 
-/** Card for account summary and next-best-action on the detail page. */
+/** Card for account summary and outreach drafting on the detail page. */
 export function AIInsightCard({
-  accountId,
+  content,
+  loadingAction,
+  error,
   onSummarize,
-  onDraftNextAction,
+  onDraftOutreach,
   className,
 }: AIInsightCardProps): ReactElement {
-  const [loadingAction, setLoadingAction] = useState<InsightAction | null>(null);
-  const [content, setContent] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  /** Run an insight action and surface the returned text. */
-  const runAction = useCallback(
-    async (action: InsightAction) => {
-      setLoadingAction(action);
-      setError(null);
-
-      try {
-        const text =
-          action === "summarize"
-            ? await onSummarize(accountId)
-            : await onDraftNextAction(accountId);
-        setContent(text);
-      } catch {
-        setError("Something went wrong. Try again in a moment.");
-      } finally {
-        setLoadingAction(null);
-      }
-    },
-    [accountId, onDraftNextAction, onSummarize],
-  );
+  const busy = loadingAction !== null;
 
   return (
     <section
@@ -60,14 +41,14 @@ export function AIInsightCard({
         <InsightButton
           label="Summarize"
           loading={loadingAction === "summarize"}
-          disabled={loadingAction !== null}
-          onClick={() => void runAction("summarize")}
+          disabled={busy}
+          onClick={onSummarize}
         />
         <InsightButton
-          label="Draft next action"
-          loading={loadingAction === "draft-next-action"}
-          disabled={loadingAction !== null}
-          onClick={() => void runAction("draft-next-action")}
+          label="Draft outreach"
+          loading={loadingAction === "draft-outreach"}
+          disabled={busy}
+          onClick={onDraftOutreach}
         />
       </div>
 
@@ -77,7 +58,13 @@ export function AIInsightCard({
         </p>
       ) : null}
 
-      {content ? (
+      {busy ? (
+        <div className={styles.highlight} aria-hidden>
+          <Skeleton width="100%" height="0.875rem" />
+          <Skeleton width="92%" height="0.875rem" />
+          <Skeleton width="78%" height="0.875rem" />
+        </div>
+      ) : content ? (
         <div className={styles.highlight} aria-live="polite">
           <p className={styles.text}>{content}</p>
         </div>
