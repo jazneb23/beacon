@@ -5,8 +5,10 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 
+import { fetchAccountSummary, fetchNextAction } from "../../lib/ai";
 import { fetchAccountDetail } from "../../lib/api";
 import { chronologicalScores } from "../../lib/scoreHistory";
+import { AIInsightCard } from "../ui/AIInsightCard";
 import { DriverBar } from "../ui/DriverBar";
 import { HealthScoreBadge } from "../ui/HealthScoreBadge";
 import { ScoreHistoryChart } from "../ui/ScoreHistoryChart";
@@ -130,6 +132,13 @@ export function AccountDetailView({ accountId }: AccountDetailViewProps): ReactE
               <p className={styles.emptyState}>No driver data available.</p>
             )}
           </section>
+
+          <AIInsightCard
+            accountId={state.account.id}
+            onSummarize={fetchAccountSummary}
+            onDraftNextAction={fetchNextAction}
+            className={styles.section}
+          />
         </>
       )}
     </section>
