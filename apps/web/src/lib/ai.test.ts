@@ -58,9 +58,7 @@ describe("fetchAccountSummary", () => {
       body: JSON.stringify({ accountId: "acct-1" }),
     });
   });
-});
 
-describe("fetchNextAction", () => {
   it("throws when the AI service returns an error payload", async () => {
     vi.stubGlobal(
       "fetch",
@@ -70,9 +68,11 @@ describe("fetchNextAction", () => {
       }),
     );
 
-    await expect(fetchNextAction("missing")).rejects.toThrow("Account not found");
+    await expect(fetchAccountSummary("missing")).rejects.toThrow("Account not found");
   });
+});
 
+describe("fetchNextAction", () => {
   it("returns formatted action and message text", async () => {
     vi.stubGlobal(
       "fetch",

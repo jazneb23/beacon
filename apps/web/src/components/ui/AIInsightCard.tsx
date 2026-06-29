@@ -49,7 +49,7 @@ export function AIInsightCard({
   return (
     <section
       className={className ? `${styles.card} ${className}` : styles.card}
-      aria-label="Account insights"
+      aria-label="AI insight"
     >
       <header className={styles.header}>
         <Sparkles aria-hidden className={styles.icon} />
