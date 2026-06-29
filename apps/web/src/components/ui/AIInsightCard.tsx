@@ -5,11 +5,13 @@ import { useCallback, useState, type ReactElement } from "react";
 
 import styles from "./AIInsightCard.module.css";
 
+export type InsightAction = "summarize" | "draft-next-action";
 export type InsightAction = "summarize" | "draft-outreach";
 
 export type AIInsightCardProps = {
   accountId: string;
   onSummarize: (accountId: string) => Promise<string>;
+  onDraftNextAction: (accountId: string) => Promise<string>;
   onDraftOutreach: (accountId: string) => Promise<string>;
   className?: string;
 };
@@ -18,6 +20,7 @@ export type AIInsightCardProps = {
 export function AIInsightCard({
   accountId,
   onSummarize,
+  onDraftNextAction,
   onDraftOutreach,
   className,
 }: AIInsightCardProps): ReactElement {
@@ -35,6 +38,7 @@ export function AIInsightCard({
         const text =
           action === "summarize"
             ? await onSummarize(accountId)
+            : await onDraftNextAction(accountId);
             : await onDraftOutreach(accountId);
         setContent(text);
       } catch {
@@ -43,12 +47,18 @@ export function AIInsightCard({
         setLoadingAction(null);
       }
     },
+    [accountId, onDraftNextAction, onSummarize],
     [accountId, onDraftOutreach, onSummarize],
   );
 
   return (
     <section
       className={className ? `${styles.card} ${className}` : styles.card}
+      aria-label="AI insight"
+    >
+      <header className={styles.header}>
+        <Sparkles aria-hidden className={styles.icon} />
+        <h2 className={styles.title}>AI Insight</h2>
       aria-label="Account insights"
     >
       <header className={styles.header}>
@@ -64,6 +74,10 @@ export function AIInsightCard({
           onClick={() => void runAction("summarize")}
         />
         <InsightButton
+          label="Draft next action"
+          loading={loadingAction === "draft-next-action"}
+          disabled={loadingAction !== null}
+          onClick={() => void runAction("draft-next-action")}
           label="Draft outreach"
           loading={loadingAction === "draft-outreach"}
           disabled={loadingAction !== null}
