@@ -1,0 +1,26 @@
+---
+description: Keep Playwright e2e tests in sync with frontend UI changes
+globs: ["apps/web/**", "e2e/**"]
+alwaysApply: false
+---
+
+# Test Maintenance
+
+All Playwright specs live under `e2e/`, split by feature area (e.g. `accounts.spec.ts`, `navigation.spec.ts`). Shared helpers go in `e2e/fixtures.ts`.
+
+When a UI component is modified in a way that changes what a user sees or interacts with (new button, changed text, new route, removed element), check whether an existing spec in `e2e/` covers that interaction.
+
+- If an existing test covers it, update that test to match the new behavior.
+- If no test covers it, add a test to the relevant `e2e/<feature>.spec.ts` file, or create a new spec file there if none fits.
+
+## Selectors
+
+Playwright tests use `data-testid` attributes for selecting elements. When adding a new interactive element, add a `data-testid` attribute to it.
+
+## Deleting Tests
+
+Never delete a passing test without explicit instruction.
+
+## After Changes
+
+After any test change, note what was updated and why.

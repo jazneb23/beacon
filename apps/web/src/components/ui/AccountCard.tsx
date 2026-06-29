@@ -79,6 +79,7 @@ export function AccountCard({
       className={styles.card}
       style={cardStyle}
       aria-label={`View ${account.name} account details`}
+      data-testid={`account-card-${account.id}`}
     >
       <div className={styles.header}>
         <h2 className={styles.accountName}>{account.name}</h2>

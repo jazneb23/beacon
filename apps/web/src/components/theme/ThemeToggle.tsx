@@ -17,6 +17,7 @@ export function ThemeToggle(): ReactElement {
       className={styles.toggle}
       onClick={toggleTheme}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      data-testid="theme-toggle"
     >
       {isDark ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
     </button>
