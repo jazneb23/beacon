@@ -37,7 +37,7 @@ export function findNorthwindAccount(accounts: Account[]): Account | undefined {
 
 /** Build per-account baseline signal values from plan tier and RNG. */
 function initProfile(account: Account, rng: SeededRNG): AccountProfile {
-  const center = PLAN_BASELINE[account.plan] + rng.int(-8, 8);
+  const center = (PLAN_BASELINE[account.plan] ?? 50) + rng.int(-8, 8);
   const baselines = Object.fromEntries(
     SIGNAL_TYPES.map((type) => {
       const offset = type === "support" ? rng.int(5, 25) : rng.int(-6, 6);
@@ -77,7 +77,8 @@ export function generateSignalEvent(
   const profile = rng.pick(profiles);
   const type = rng.pick(SIGNAL_TYPES);
   const drift = rng.int(-4, 4);
-  const value = clamp(profile.baselines[type] + drift, 0, 100);
+  const baseline = profile.baselines[type] ?? 50;
+  const value = clamp(baseline + drift, 0, 100);
   profile.baselines[type] = value;
 
   return {
