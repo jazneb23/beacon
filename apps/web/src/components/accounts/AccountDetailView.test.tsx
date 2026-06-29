@@ -8,6 +8,11 @@ vi.mock("../../lib/api", () => ({
   fetchAccountDetail: vi.fn(),
 }));
 
+vi.mock("../../lib/ai", () => ({
+  fetchAccountSummary: vi.fn(),
+  fetchNextAction: vi.fn(),
+}));
+
 vi.mock("next/link", () => ({
   default: ({
     href,
@@ -81,6 +86,9 @@ describe("AccountDetailView", () => {
     expect(screen.getByTestId("score-history-chart")).toBeInTheDocument();
     expect(screen.getByText("Product usage")).toBeInTheDocument();
     expect(screen.getByText("Support volume")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "AI Insight" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Summarize" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Draft next action" })).toBeInTheDocument();
   });
 
   it("shows an error state when the account cannot be loaded", async () => {
