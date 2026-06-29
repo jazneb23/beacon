@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+
+reviews:
+  profile: chill
+  high_level_summary: true
+
+  path_filters:
+    - "!**/dist/**"
+    - "!**/.next/**"
+    - "!**/node_modules/**"
+    - "!**/pnpm-lock.yaml"
+    - "!**/package-lock.json"
+    - "!**/yarn.lock"
+    - "!**/*.lock"
+
+  path_instructions:
+    - path: "apps/api/**"
+      instructions: |
+        Beacon API conventions:
+        - Every JSON response must use the project envelope: `{ data: ... }` on success or `{ error: ... }` on failure. Prefer the `sendData` and `sendError` helpers in `apps/api/src/http.ts` instead of ad-hoc `res.json()` shapes.
+        - Every new feature or behavior change needs a matching test (see existing `*.test.ts` files under `apps/api`).
+        - Flag routes that return raw payloads, mixed success/error keys, or non-string error values.
+        - Flag new endpoints or handlers added without corresponding test coverage.
+
+    - path: "packages/shared/**"
+      instructions: |
+        CRITICAL — shared types are consumed across the monorepo. Treat any breaking change as a high-severity issue and call it out prominently in review comments.
+        - Loudly flag removals, renames, narrowed unions, stricter required fields, or changed semantics on exported types and functions.
+        - Types must stay in `packages/shared` and be imported elsewhere — never duplicated in app code.
+        - Ask whether downstream apps (`apps/api`, `apps/web`, `apps/ai`) were updated for any exported type change.
+        - Breaking changes need explicit justification; prefer additive, backward-compatible changes.
