@@ -16,6 +16,7 @@
   --color-brand-500: #1f6feb;
   --color-brand-400: #4d8ef0;
   --color-brand-600: #1558d0;
+  --color-text-on-brand: #ffffff;
 }
 
 /* Brand tint background — light mode only (too low-contrast on dark surfaces) */
@@ -231,7 +232,8 @@
   --card-gap: var(--space-4);
   --section-padding-x: var(--space-8);
   --section-padding-y: var(--space-6);
-  --sidebar-width: 280px;
+  --sidebar-width: 240px;
+  --sidebar-width-collapsed: 60px;
   --header-height: 56px;
 }
 

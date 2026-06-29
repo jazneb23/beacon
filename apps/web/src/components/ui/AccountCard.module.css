@@ -1,30 +1,57 @@
+/* Keyframes are defined locally: CSS Modules scope animation names, so a
+   global keyframe reference would not resolve under Turbopack. */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scoreHighlight {
+  0% {
+    background: transparent;
+  }
+  30% {
+    background: color-mix(in srgb, currentColor 18%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--card-gap);
+  gap: var(--space-3);
   padding: var(--card-padding);
   background: var(--color-bg-overlay);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--color-border);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
   box-shadow: var(--shadow-sm);
   cursor: pointer;
   text-decoration: none;
   color: inherit;
+  opacity: 0;
+  animation: fadeUp 0.3s ease-out forwards;
   transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+    background 0.15s ease-out,
+    box-shadow 0.15s ease-out;
 }
 
 .card:hover {
-  transform: scale(1.02);
+  background: var(--color-bg-subtle);
   box-shadow: var(--shadow-md);
 }
 
 .header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .accountName {
@@ -33,6 +60,9 @@
   font-weight: var(--text-account-name-weight);
   line-height: var(--text-account-name-line-height);
   color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .planBadge {
@@ -60,6 +90,14 @@
   color: var(--color-plan-enterprise);
 }
 
+.lastSignal {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
 .scoreRow {
   display: flex;
   align-items: center;
@@ -67,14 +105,26 @@
   gap: var(--space-3);
 }
 
-.caption {
-  margin: 0;
-  font-size: var(--text-caption-size);
-  font-weight: var(--text-caption-weight);
-  line-height: var(--text-caption-line-height);
-  color: var(--color-text-muted);
+.scoreFlash {
+  display: inline-flex;
+  border-radius: var(--radius-md);
+  animation: scoreHighlight 0.7s ease-out;
 }
 
-.captionRisk {
-  color: var(--color-health-red);
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.driver {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+.signalCount {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
 }

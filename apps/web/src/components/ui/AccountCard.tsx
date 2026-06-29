@@ -1,13 +1,14 @@
+"use client";
+
 import type { Account, HealthScore } from "@beacon/shared";
 import Link from "next/link";
-import type { ReactElement } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactElement } from "react";
 
+import { formatRelativeTime } from "./signalRowUtils";
 import styles from "./AccountCard.module.css";
-import { getTopNegativeDriver } from "./accountCardUtils";
-import {
-  HealthScoreBadge,
-  type HealthScoreBadgeSize,
-} from "./HealthScoreBadge";
+import { getTopDriver } from "./accountCardUtils";
+import { getHealthScoreBand, getHealthScoreColor } from "./healthScoreBand";
+import { HealthScoreBadge, type HealthScoreBadgeSize } from "./HealthScoreBadge";
 import { ScoreSparkline } from "./ScoreSparkline";
 
 export type AccountCardProps = {
@@ -15,6 +16,10 @@ export type AccountCardProps = {
   score: HealthScore;
   scoreHistory?: number[];
   scoreSize?: HealthScoreBadgeSize;
+  signalsThisWeek?: number;
+  index?: number;
+  refreshTick?: number;
+  animateCount?: boolean;
 };
 
 const PLAN_BADGE_CLASS: Record<Account["plan"], string> = {
@@ -23,20 +28,56 @@ const PLAN_BADGE_CLASS: Record<Account["plan"], string> = {
   enterprise: styles.planEnterprise,
 };
 
-/** Card for the health board grid linking to account detail. */
+const FLASH_MS = 700;
+
+/** Compact, information-dense card for the health board grid. */
 export function AccountCard({
   account,
   score,
   scoreHistory,
-  scoreSize = "md",
+  scoreSize = "lg",
+  signalsThisWeek,
+  index = 0,
+  refreshTick,
+  animateCount = false,
 }: AccountCardProps): ReactElement {
   const history = scoreHistory ?? Array<number>(6).fill(score.score);
-  const topNegativeDriver = getTopNegativeDriver(score.drivers);
+  const topDriver = getTopDriver(score.drivers);
+  const band = getHealthScoreBand(score.score);
+  const accentColor = getHealthScoreColor(band);
+
+  const previousScore = useRef(score.score);
+  const [flash, setFlash] = useState<"up" | "down" | null>(null);
+
+  useEffect(() => {
+    if (score.score !== previousScore.current) {
+      setFlash(score.score > previousScore.current ? "up" : "down");
+      previousScore.current = score.score;
+      const id = window.setTimeout(() => setFlash(null), FLASH_MS);
+      return () => window.clearTimeout(id);
+    }
+  }, [score.score]);
+
+  const lastSignal = formatRelativeTime(
+    score.updatedAt,
+    refreshTick !== undefined ? new Date() : undefined,
+  );
+
+  const cardStyle: CSSProperties = {
+    borderLeftColor: accentColor,
+    animationDelay: `${index * 50}ms`,
+  };
+
+  const flashStyle: CSSProperties | undefined =
+    flash === null
+      ? undefined
+      : { color: flash === "up" ? "var(--color-health-green)" : "var(--color-health-red)" };
 
   return (
     <Link
       href={`/accounts/${account.id}`}
       className={styles.card}
+      style={cardStyle}
       aria-label={`View ${account.name} account details`}
     >
       <div className={styles.header}>
@@ -44,20 +85,43 @@ export function AccountCard({
         <span className={`${styles.planBadge} ${PLAN_BADGE_CLASS[account.plan]}`}>
           {account.plan}
         </span>
+        <span className={styles.lastSignal}>last signal {lastSignal}</span>
       </div>
 
       <div className={styles.scoreRow}>
-        <HealthScoreBadge score={score.score} trend={score.trend} size={scoreSize} />
+        <span className={flash ? styles.scoreFlash : undefined} style={flashStyle}>
+          <HealthScoreBadge
+            score={score.score}
+            trend={score.trend}
+            size={scoreSize}
+            animateCount={animateCount}
+          />
+        </span>
         <ScoreSparkline scores={history} />
       </div>
 
-      <p
-        className={`${styles.caption} ${topNegativeDriver ? styles.captionRisk : ""}`}
-      >
-        {topNegativeDriver
-          ? topNegativeDriver.label
-          : "No active negative drivers"}
-      </p>
+      <div className={styles.footer}>
+        {topDriver ? (
+          <span
+            className={styles.driver}
+            style={{
+              color:
+                topDriver.direction === "negative"
+                  ? "var(--color-health-red)"
+                  : "var(--color-health-green)",
+            }}
+          >
+            {topDriver.label}
+          </span>
+        ) : (
+          <span className={styles.driver}>No active drivers</span>
+        )}
+        {signalsThisWeek !== undefined ? (
+          <span className={styles.signalCount}>
+            {signalsThisWeek} signal{signalsThisWeek === 1 ? "" : "s"} this week
+          </span>
+        ) : null}
+      </div>
     </Link>
   );
 }

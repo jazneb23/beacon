@@ -1,0 +1,16 @@
+/* Local keyframes: CSS Modules scope animation names under Turbopack. */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.skeleton {
+  display: block;
+  background: var(--color-bg-subtle);
+  animation: pulse 1.5s ease-in-out infinite;
+}

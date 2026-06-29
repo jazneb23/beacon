@@ -36,7 +36,17 @@ describe("HealthScoreBadge", () => {
 
     rerender(<HealthScoreBadge score={55} trend="flat" size="lg" />);
     expect(screen.getByText("55")).toHaveStyle({
+      fontSize: "var(--text-4xl)",
+    });
+
+    rerender(<HealthScoreBadge score={55} trend="flat" size="xl" />);
+    expect(screen.getByText("55")).toHaveStyle({
       fontSize: "var(--text-score-display-size)",
     });
+  });
+
+  it("renders the final score immediately when not animating", () => {
+    render(<HealthScoreBadge score={88} trend="up" />);
+    expect(screen.getByText("88")).toBeInTheDocument();
   });
 });

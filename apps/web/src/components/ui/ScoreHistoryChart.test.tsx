@@ -8,12 +8,11 @@ afterEach(() => {
 });
 
 describe("ScoreHistoryChart", () => {
-  it("renders a larger chart with the score path", () => {
+  it("renders the chart container with a responsive wrapper", () => {
     render(<ScoreHistoryChart scores={[55, 62, 68, 72]} />);
 
     const chart = screen.getByTestId("score-history-chart");
     expect(chart).toBeInTheDocument();
-    expect(chart.querySelectorAll("line")).toHaveLength(3);
-    expect(chart.querySelector("path[stroke-width='3']")).toBeInTheDocument();
+    expect(chart.querySelector(".recharts-responsive-container")).toBeInTheDocument();
   });
 });

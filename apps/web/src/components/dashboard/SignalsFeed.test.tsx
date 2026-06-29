@@ -1,10 +1,26 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SignalsFeed } from "./SignalsFeed";
 
 vi.mock("../../lib/api", () => ({
   fetchRecentSignals: vi.fn(),
+}));
+
+vi.mock("next/link", () => ({
+  default: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string;
+    children: ReactNode;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
 import { fetchRecentSignals } from "../../lib/api";
@@ -32,10 +48,8 @@ describe("SignalsFeed", () => {
   it("renders recent signal rows after loading", async () => {
     render(<SignalsFeed />);
 
-    expect(screen.getByText("Loading signals…")).toBeInTheDocument();
-
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Signals Feed" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Live Signals" })).toBeInTheDocument();
       expect(screen.getByText("Northwind Analytics")).toBeInTheDocument();
       expect(screen.getByText("Usage drop")).toBeInTheDocument();
     });

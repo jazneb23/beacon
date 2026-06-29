@@ -54,7 +54,8 @@ describe("AccountCard", () => {
     expect(screen.getByRole("heading", { name: "Northwind Analytics" })).toBeInTheDocument();
     expect(screen.getByText("enterprise")).toBeInTheDocument();
     expect(screen.getByText("72")).toBeInTheDocument();
-    expect(screen.getByText("Support volume")).toBeInTheDocument();
+    // The highest-weight driver overall is shown as the colored caption.
+    expect(screen.getByText("Product usage")).toBeInTheDocument();
     expect(screen.getByRole("link")).toHaveAttribute(
       "href",
       "/accounts/acct-northwind",

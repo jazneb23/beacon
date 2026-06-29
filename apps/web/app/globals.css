@@ -1,3 +1,4 @@
 @import "../src/styles/globals.css";
 @import "../src/styles/tokens.css";
+@import "../src/styles/animations.css";
 @import "tailwindcss";

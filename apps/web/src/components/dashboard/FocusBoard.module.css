@@ -1,0 +1,88 @@
+.page {
+  padding-bottom: var(--space-12);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.stats {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+
+.statRed {
+  color: var(--color-health-red);
+}
+
+.statAmber {
+  color: var(--color-health-amber);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-bg-overlay);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.skeletonMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.message {
+  padding: var(--space-8);
+  text-align: center;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-health-red);
+}
+
+.retryButton {
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-brand-500);
+  background: color-mix(in srgb, var(--color-brand-500) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-brand-500) 24%, transparent);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease-out;
+}
+
+.retryButton:hover {
+  background: color-mix(in srgb, var(--color-brand-500) 16%, transparent);
+}

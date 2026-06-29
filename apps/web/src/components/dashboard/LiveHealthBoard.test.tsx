@@ -6,12 +6,7 @@ import { LiveHealthBoard } from "./LiveHealthBoard";
 
 vi.mock("../../lib/api", () => ({
   fetchAccounts: vi.fn(),
-  fetchRecentSignals: vi.fn(),
   fetchScores: vi.fn(),
-}));
-
-vi.mock("./SignalsFeed", () => ({
-  SignalsFeed: () => <aside aria-label="Signals Feed">Signals Feed</aside>,
 }));
 
 vi.mock("next/link", () => ({
@@ -29,29 +24,26 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { fetchAccounts, fetchRecentSignals, fetchScores } from "../../lib/api";
+import { fetchAccounts, fetchScores } from "../../lib/api";
 
-const account = {
+const troubledScore = {
+  accountId: "acct-northwind",
+  score: 35,
+  trend: "down" as const,
+  drivers: [{ label: "Support volume", weight: 0.4, direction: "negative" as const }],
+  updatedAt: "2026-06-20T12:00:00Z",
+};
+
+const troubledAccount = {
   id: "acct-northwind",
   name: "Northwind Analytics",
   plan: "enterprise" as const,
-  latestScore: {
-    accountId: "acct-northwind",
-    score: 72,
-    trend: "up" as const,
-    drivers: [
-      { label: "Support volume", weight: 0.15, direction: "negative" as const },
-    ],
-    updatedAt: "2026-06-20T12:00:00Z",
-  },
+  latestScore: troubledScore,
 };
 
-const score = account.latestScore;
-
 beforeEach(() => {
-  vi.mocked(fetchAccounts).mockResolvedValue([account]);
-  vi.mocked(fetchScores).mockResolvedValue([score]);
-  vi.mocked(fetchRecentSignals).mockResolvedValue([]);
+  vi.mocked(fetchAccounts).mockResolvedValue([troubledAccount]);
+  vi.mocked(fetchScores).mockResolvedValue([troubledScore]);
 });
 
 afterEach(() => {
@@ -60,20 +52,33 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe("LiveHealthBoard", () => {
-  it("renders account cards after loading", async () => {
+describe("LiveHealthBoard (focus worklist)", () => {
+  it("lists troubled accounts with a recommended action", async () => {
     render(<LiveHealthBoard />);
 
-    expect(screen.getByText("Loading accounts…")).toBeInTheDocument();
-
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Live Health Board" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Northwind Analytics" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Northwind Analytics" }),
+      ).toBeInTheDocument();
     });
 
+    expect(screen.getByText("1 account need attention right now")).toBeInTheDocument();
+    expect(screen.getByText("Draft outreach")).toBeInTheDocument();
     expect(fetchAccounts).toHaveBeenCalled();
     expect(fetchScores).toHaveBeenCalled();
-    expect(screen.getByLabelText("Signals Feed")).toBeInTheDocument();
+  });
+
+  it("shows an all-clear state when every account is healthy", async () => {
+    vi.mocked(fetchAccounts).mockResolvedValue([
+      { ...troubledAccount, latestScore: { ...troubledScore, score: 82, trend: "up" } },
+    ]);
+    vi.mocked(fetchScores).mockResolvedValue([{ ...troubledScore, score: 82, trend: "up" }]);
+
+    render(<LiveHealthBoard />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "All clear" })).toBeInTheDocument();
+    });
   });
 
   it("shows an error state when fetching fails", async () => {

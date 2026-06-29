@@ -33,6 +33,14 @@ export function getTopNegativeDriver(
   );
 }
 
+/** Pick the highest-weight driver overall (used for the colored card caption). */
+export function getTopDriver(drivers: ScoreDriver[]): ScoreDriver | null {
+  if (drivers.length === 0) {
+    return null;
+  }
+  return drivers.reduce((top, driver) => (driver.weight > top.weight ? driver : top));
+}
+
 /** Build an SVG path for a normalized 0–100 sparkline. */
 export function buildSparklinePath(
   points: number[],

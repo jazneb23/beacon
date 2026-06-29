@@ -2,15 +2,22 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { PageTitleProvider } from "../../contexts/PageTitleContext";
 import { AccountDetailView } from "./AccountDetailView";
 
 vi.mock("../../lib/api", () => ({
   fetchAccountDetail: vi.fn(),
+  fetchRecentSignals: vi.fn(),
 }));
 
 vi.mock("../../lib/ai", () => ({
   fetchAccountSummary: vi.fn(),
   fetchNextAction: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/accounts/acct-northwind",
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 vi.mock("next/link", () => ({
@@ -28,7 +35,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { fetchAccountDetail } from "../../lib/api";
+import { fetchAccountDetail, fetchRecentSignals } from "../../lib/api";
 
 const detail = {
   account: {
@@ -63,7 +70,16 @@ const detail = {
 
 beforeEach(() => {
   vi.mocked(fetchAccountDetail).mockResolvedValue(detail);
+  vi.mocked(fetchRecentSignals).mockResolvedValue([]);
 });
+
+function renderDetail(accountId: string) {
+  return render(
+    <PageTitleProvider>
+      <AccountDetailView accountId={accountId} />
+    </PageTitleProvider>,
+  );
+}
 
 afterEach(() => {
   cleanup();
@@ -72,29 +88,27 @@ afterEach(() => {
 
 describe("AccountDetailView", () => {
   it("loads account detail and renders chart plus driver bars", async () => {
-    render(<AccountDetailView accountId="acct-northwind" />);
-
-    expect(screen.getByText("Loading account…")).toBeInTheDocument();
+    renderDetail("acct-northwind");
 
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "Northwind Analytics" })).toBeInTheDocument();
     });
 
     expect(fetchAccountDetail).toHaveBeenCalledWith("acct-northwind");
-    expect(screen.getByRole("link", { name: /Back to board/i })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Health Board" })).toHaveAttribute("href", "/");
     expect(screen.getByText("72")).toBeInTheDocument();
     expect(screen.getByTestId("score-history-chart")).toBeInTheDocument();
     expect(screen.getByText("Product usage")).toBeInTheDocument();
     expect(screen.getByText("Support volume")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "AI Insight" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Summarize" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Draft next action" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Draft outreach" })).toBeInTheDocument();
   });
 
   it("shows an error state when the account cannot be loaded", async () => {
     vi.mocked(fetchAccountDetail).mockRejectedValue(new Error("Account not found"));
 
-    render(<AccountDetailView accountId="missing" />);
+    renderDetail("missing");
 
     await waitFor(() => {
       expect(screen.getByText("Account not found")).toBeInTheDocument();
