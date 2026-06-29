@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: beacon-api-staging
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @beacon/api... build
+    startCommand: node apps/api/dist/src/index.js
+    envVars:
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: DATABASE_URL
+        sync: false
+
+  - type: web
+    name: beacon-ai-staging
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @beacon/ai... build
+    startCommand: node apps/ai/dist/src/index.js
+    envVars:
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: API_URL
+        sync: false
