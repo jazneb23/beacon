@@ -2,12 +2,23 @@ import { Pool, type PoolConfig } from "pg";
 
 let pool: Pool | null = null;
 
+/** Mask credentials in a Postgres connection string for safe logging. */
+function maskConnectionString(connectionString: string): string {
+  return connectionString.replace(/:\/\/([^:]+):([^@]+)@/, "://$1:****@");
+}
+
 /** Return pool options; relax SSL verification for Supabase hosted databases. */
 export function buildPoolConfig(connectionString: string): PoolConfig {
   const config: PoolConfig = { connectionString };
+  console.log("[buildPoolConfig] connectionString:", maskConnectionString(connectionString));
+  console.log(
+    "[buildPoolConfig] connectionString.includes('supabase.com'):",
+    connectionString.includes("supabase.com"),
+  );
   if (connectionString.includes("supabase.com")) {
     config.ssl = { rejectUnauthorized: false };
   }
+  console.log("[buildPoolConfig] final config.ssl:", config.ssl);
   return config;
 }
 
