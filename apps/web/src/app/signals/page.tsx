@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 
-import { PageHeader } from "../../src/components/layout/PageHeader";
-import { SignalsFeed } from "../../src/components/dashboard/SignalsFeed";
+import { PageHeader } from "../../components/layout/PageHeader";
+import { SignalsFeed } from "../../components/dashboard/SignalsFeed";
 
 export default function SignalsPage(): ReactElement {
   return (

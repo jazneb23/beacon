@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "beacon": {
+      "command": "node",
+      "args": ["/Users/jeremy/beacon/apps/mcp/dist/src/index.js"],
+      "env": {
+        "API_URL": "http://localhost:3001",
+        "AI_URL": "http://localhost:3002"
+      }
+    }
+  }
+}

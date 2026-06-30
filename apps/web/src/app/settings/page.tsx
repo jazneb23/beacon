@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-import { SettingsView } from "../../src/components/settings/SettingsView";
+import { SettingsView } from "../../components/settings/SettingsView";
 
 export default function SettingsPage(): ReactElement {
   return <SettingsView />;
