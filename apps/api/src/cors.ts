@@ -3,7 +3,11 @@ import type { NextFunction, Request, Response } from "express";
 const DEFAULT_WEB_ORIGINS = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
+  "https://beacon-web-brown.vercel.app",
 ];
+
+/** Matches Vercel preview deployments (https only, single subdomain chain). */
+const VERCEL_PREVIEW_ORIGIN_PATTERN = /^https:\/\/[\w.-]+\.vercel\.app$/;
 
 /** Resolve allowed browser origins from env with local web defaults. */
 function getAllowedOrigins(): string[] {
@@ -15,6 +19,15 @@ function getAllowedOrigins(): string[] {
   return configured.split(",").map((origin) => origin.trim());
 }
 
+/** Check explicit allowlist entries and Vercel preview URL pattern. */
+function isOriginAllowed(origin: string, allowedOrigins: string[]): boolean {
+  if (allowedOrigins.includes(origin)) {
+    return true;
+  }
+
+  return VERCEL_PREVIEW_ORIGIN_PATTERN.test(origin);
+}
+
 /** Allow cross-origin requests from the Beacon web app. */
 export function corsMiddleware(
   req: Request,
@@ -24,7 +37,7 @@ export function corsMiddleware(
   const origin = req.headers.origin;
   const allowedOrigins = getAllowedOrigins();
 
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && isOriginAllowed(origin, allowedOrigins)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Vary", "Origin");
   }

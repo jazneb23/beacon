@@ -40,4 +40,41 @@ describe("corsMiddleware", () => {
       "http://localhost:3000",
     );
   });
+
+  it("allows the deployed Vercel web app origin", async () => {
+    const app = createTestApp();
+
+    const response = await request(app)
+      .get("/ping")
+      .set("Origin", "https://beacon-web-brown.vercel.app");
+
+    expect(response.status).toBe(200);
+    expect(response.headers["access-control-allow-origin"]).toBe(
+      "https://beacon-web-brown.vercel.app",
+    );
+  });
+
+  it("allows Vercel preview deployment origins", async () => {
+    const app = createTestApp();
+
+    const response = await request(app)
+      .get("/ping")
+      .set("Origin", "https://beacon-web-git-feature-team.vercel.app");
+
+    expect(response.status).toBe(200);
+    expect(response.headers["access-control-allow-origin"]).toBe(
+      "https://beacon-web-git-feature-team.vercel.app",
+    );
+  });
+
+  it("rejects origins outside the allowlist and Vercel preview pattern", async () => {
+    const app = createTestApp();
+
+    const response = await request(app)
+      .get("/ping")
+      .set("Origin", "https://evil.example.com");
+
+    expect(response.status).toBe(200);
+    expect(response.headers["access-control-allow-origin"]).toBeUndefined();
+  });
 });
