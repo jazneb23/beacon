@@ -14,6 +14,22 @@ services:
         sync: false
 
   - type: web
+    name: beacon-api-production
+    runtime: node
+    plan: free
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @beacon/api... build
+    startCommand: node apps/api/dist/src/index.js
+    envVars:
+      - key: PNPM_VERSION
+        value: "9"
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: DATABASE_URL
+        sync: false
+      - key: NODE_ENV
+        value: production
+
+  - type: web
     name: beacon-ai-staging
     runtime: node
     plan: free
@@ -29,16 +45,20 @@ services:
       - key: API_URL
         sync: false
 
-  - type: worker
-    name: beacon-ingest-staging
+  - type: web
+    name: beacon-ai-production
     runtime: node
     plan: free
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @beacon/ingest... build
-    startCommand: node apps/ingest/dist/src/index.js
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @beacon/ai... build
+    startCommand: node apps/ai/dist/src/index.js
     envVars:
       - key: PNPM_VERSION
         value: "9"
       - key: SKIP_INSTALL_DEPS
         value: "true"
+      - key: ANTHROPIC_API_KEY
+        sync: false
       - key: API_URL
-        value: https://beacon-api-staging.onrender.com
+        sync: false
+      - key: NODE_ENV
+        value: production
