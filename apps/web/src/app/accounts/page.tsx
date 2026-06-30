@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 
-import { BoardView } from "../../src/components/dashboard/BoardView";
-import type { BoardFilter } from "../../src/lib/boardFilters";
+import { BoardView } from "../../components/dashboard/BoardView";
+import type { BoardFilter } from "../../lib/boardFilters";
 
 const VALID_FILTERS: BoardFilter[] = ["all", "at-risk", "warning", "healthy"];
 

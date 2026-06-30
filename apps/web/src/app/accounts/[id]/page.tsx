@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-import { AccountDetailView } from "../../../src/components/accounts/AccountDetailView";
+import { AccountDetailView } from "../../../components/accounts/AccountDetailView";
 
 type AccountDetailPageProps = {
   params: Promise<{ id: string }>;

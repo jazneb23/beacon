@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
 
-import { PageTitleProvider } from "../src/contexts/PageTitleContext";
-import { UserProvider } from "../src/contexts/UserContext";
-import { AppShell } from "../src/components/layout/AppShell";
-import { ThemeProvider } from "../src/components/theme/ThemeProvider";
-import { themeInitScript } from "../src/lib/theme";
+import { PageTitleProvider } from "../contexts/PageTitleContext";
+import { UserProvider } from "../contexts/UserContext";
+import { AppShell } from "../components/layout/AppShell";
+import { ThemeProvider } from "../components/theme/ThemeProvider";
+import { themeInitScript } from "../lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {

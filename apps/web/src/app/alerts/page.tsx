@@ -1,7 +1,7 @@
 import { Bell } from "lucide-react";
 import type { ReactElement } from "react";
 
-import { EmptyState } from "../../src/components/ui/EmptyState";
+import { EmptyState } from "../../components/ui/EmptyState";
 
 export default function AlertsPage(): ReactElement {
   return (
