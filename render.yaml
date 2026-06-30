@@ -28,3 +28,17 @@ services:
         sync: false
       - key: API_URL
         sync: false
+
+  - type: worker
+    name: beacon-ingest-staging
+    runtime: node
+    plan: free
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @beacon/ingest... build
+    startCommand: node apps/ingest/dist/src/index.js
+    envVars:
+      - key: PNPM_VERSION
+        value: "9"
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: API_URL
+        value: https://beacon-api-staging.onrender.com
