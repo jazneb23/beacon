@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy API to production
+        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK_API_PROD }}"
+
+      - name: Deploy AI to production
+        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK_AI_PROD }}"
+
+      - name: Deploy Web to production
+        run: curl -fsSL -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_PROD }}"
