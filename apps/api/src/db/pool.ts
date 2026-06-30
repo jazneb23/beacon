@@ -7,10 +7,21 @@ function maskConnectionString(connectionString: string): string {
   return connectionString.replace(/:\/\/([^:]+):([^@]+)@/, "://$1:****@");
 }
 
+/** Remove sslmode from the URL so explicit PoolConfig.ssl is not overridden by pg. */
+function stripSslmodeFromConnectionString(connectionString: string): string {
+  const url = new URL(connectionString);
+  if (!url.searchParams.has("sslmode")) {
+    return connectionString;
+  }
+  url.searchParams.delete("sslmode");
+  return url.toString();
+}
+
 /** Return pool options; relax SSL verification for Supabase hosted databases. */
 export function buildPoolConfig(connectionString: string): PoolConfig {
-  const config: PoolConfig = { connectionString };
-  console.log("[buildPoolConfig] connectionString:", maskConnectionString(connectionString));
+  const sanitizedConnectionString = stripSslmodeFromConnectionString(connectionString);
+  const config: PoolConfig = { connectionString: sanitizedConnectionString };
+  console.log("[buildPoolConfig] connectionString:", maskConnectionString(sanitizedConnectionString));
   console.log(
     "[buildPoolConfig] connectionString.includes('supabase.com'):",
     connectionString.includes("supabase.com"),
