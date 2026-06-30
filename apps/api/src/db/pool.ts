@@ -1,6 +1,15 @@
-import { Pool } from "pg";
+import { Pool, type PoolConfig } from "pg";
 
 let pool: Pool | null = null;
+
+/** Return pool options; relax SSL verification for Supabase hosted databases. */
+export function buildPoolConfig(connectionString: string): PoolConfig {
+  const config: PoolConfig = { connectionString };
+  if (connectionString.includes("supabase.com")) {
+    config.ssl = { rejectUnauthorized: false };
+  }
+  return config;
+}
 
 /** Return a singleton Postgres pool using DATABASE_URL. */
 export function getPool(): Pool {
@@ -9,7 +18,7 @@ export function getPool(): Pool {
     if (!connectionString) {
       throw new Error("DATABASE_URL environment variable is required");
     }
-    pool = new Pool({ connectionString });
+    pool = new Pool(buildPoolConfig(connectionString));
   }
   return pool;
 }
