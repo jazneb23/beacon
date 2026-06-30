@@ -76,6 +76,19 @@ describe("routes", () => {
       expect(response.body.data).toHaveLength(1);
       expect(response.body.data[0].latestScore.score).toBe(72);
     });
+
+    it("returns 500 and logs when the database query fails", async () => {
+      const dbError = new Error("connection refused");
+      vi.mocked(listAccountsWithLatestScore).mockRejectedValue(dbError);
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const response = await request(app).get("/accounts");
+
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: "Internal server error" });
+      expect(consoleSpy).toHaveBeenCalledWith(dbError);
+      consoleSpy.mockRestore();
+    });
   });
 
   describe("GET /accounts/:id", () => {
@@ -174,6 +187,19 @@ describe("routes", () => {
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
       expect(response.body.data[0].accountId).toBe("acct-test");
+    });
+
+    it("returns 500 and logs when the database query fails", async () => {
+      const dbError = new Error("connection refused");
+      vi.mocked(listLatestHealthScores).mockRejectedValue(dbError);
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const response = await request(app).get("/scores");
+
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: "Internal server error" });
+      expect(consoleSpy).toHaveBeenCalledWith(dbError);
+      consoleSpy.mockRestore();
     });
   });
 });

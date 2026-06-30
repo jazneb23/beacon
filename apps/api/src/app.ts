@@ -1,6 +1,7 @@
-import express from "express";
+import express, { type NextFunction, type Request, type Response } from "express";
 import type { Pool } from "pg";
 import { corsMiddleware } from "./cors.js";
+import { sendError } from "./http.js";
 import { createAccountsRouter } from "./routes/accounts.js";
 import { healthRouter } from "./routes/health.js";
 import { createScoresRouter } from "./routes/scores.js";
@@ -16,6 +17,15 @@ export function createApp(pool: Pool) {
   app.use("/accounts", createAccountsRouter(pool));
   app.use("/signals", createSignalsRouter(pool));
   app.use("/scores", createScoresRouter(pool));
+
+  app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
+    if (res.headersSent) {
+      next(err);
+      return;
+    }
+    sendError(res, "Internal server error", 500);
+  });
 
   return app;
 }
