@@ -1,0 +1,30 @@
+{
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "install": "pnpm install --frozen-lockfile && pnpm --filter @beacon/shared build && bash .cursor/cloud-env-setup.sh && pnpm exec playwright install --with-deps chromium",
+  "start": "sudo service docker start && docker compose up -d && bash .cursor/cloud-db-init.sh",
+  "terminals": [
+    {
+      "name": "api",
+      "command": "pnpm --filter @beacon/api dev",
+      "description": "Beacon API on http://localhost:3001"
+    },
+    {
+      "name": "ai",
+      "command": "pnpm --filter @beacon/ai dev",
+      "description": "Beacon AI on http://localhost:3002"
+    },
+    {
+      "name": "web",
+      "command": "pnpm --filter @beacon/web dev",
+      "description": "Beacon Web on http://localhost:3000"
+    }
+  ],
+  "ports": [
+    { "name": "web", "port": 3000 },
+    { "name": "api", "port": 3001 },
+    { "name": "ai", "port": 3002 }
+  ]
+}
